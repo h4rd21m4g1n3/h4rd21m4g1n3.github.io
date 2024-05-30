@@ -13,6 +13,9 @@ import java.time.LocalDate;
 @Table(name="transaction")
 public abstract class Transaction {
 
+    @Column(name = "user_id", nullable = false)
+    private int userId;
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id", nullable = false)
@@ -28,11 +31,6 @@ public abstract class Transaction {
     @Column(name = "transaction_date", nullable = false)
     private LocalDate transactionDate;
 
-//    @Enumerated(EnumType.STRING)
-//    @Column(name = "category", nullable = false)
-//    private TransactionCategory category;
 
-    //equals??
-    //hashcode??
 
 }

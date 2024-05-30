@@ -24,7 +24,7 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/transactions/expenses")
+    @RequestMapping("/transactions/expenses")
 public class ExpenseController {
 
     private final ExpenseService expenseService;
@@ -41,7 +41,7 @@ public class ExpenseController {
     private ExpenseRepository expenseRepository;
 
     @PostMapping("/add-expense")
-    public ResponseEntity<?> addExpense(@RequestBody ExpenseDTO expenseDto) {
+    public ResponseEntity<?> addExpense(@RequestBody ExpenseDTO expenseDto, @RequestParam int userId) {
         ExpenseCategory expenseCategory = expenseDto.getExpenseCategory();
         Long expenseCategoryId = expenseDto.getExpenseCategory().getId();
 
@@ -66,6 +66,7 @@ public class ExpenseController {
         }
 
         Expense expense = new Expense();
+        expense.setUserId(userId);  // Set the userId for the transaction
         expense.setAmount(expenseDto.getAmount());
         expense.setName(expenseDto.getName());
         expense.setTransactionDate(expenseDto.getTransactionDate());
@@ -77,28 +78,28 @@ public class ExpenseController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateExpense(@PathVariable("id") int id, @RequestBody Expense updatedExpense) {
+    public ResponseEntity<?> updateExpense(@PathVariable("id") int id, @RequestBody Expense updatedExpense,  @RequestParam int userId) {
         if (!expenseRepository.existsById(id)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Income with id " + id + " not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Expense with id " + id + " not found");
         }
         updatedExpense.setId(id);
-        expenseService.updateExpense(updatedExpense);
+        expenseService.updateExpense(updatedExpense, userId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteExpense(@PathVariable("id") int id) {
+    public ResponseEntity<?> deleteExpense(@PathVariable("id") int id,  @RequestParam int userId) {
         if (!expenseRepository.existsById(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Income with id " + id + " not found");
         }
-        expenseService.deleteExpense(id);
+        expenseService.deleteExpense(id, userId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getExpenseById(@PathVariable("id") int id) {
+    public ResponseEntity<?> getExpenseById(@PathVariable("id") int id, @RequestParam int userId) {
         try {
-            Expense expense = expenseService.getExpenseById(id);
+            Expense expense = expenseService.getExpenseById(id, userId);
             if (expense == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Expense with id " + id + " not found");
             }
@@ -108,17 +109,22 @@ public class ExpenseController {
         }
     }
 
+    //////////////////////
+
+    //tested
     @GetMapping("/all_expenses_desc")
-    public ResponseEntity<List<Expense>> getAllExpensesDesc() {
-        List<Expense> expenses = expenseService.getAllExpensesDescendingOrder();
+    public ResponseEntity<List<Expense>> getAllExpensesDesc(@RequestParam int userId) {
+        List<Expense> expenses = expenseService.getAllExpensesDescendingOrder(userId);
         return ResponseEntity.ok().body(expenses);
     }
 
+    //tested
     @GetMapping("/all_expenses_asc")
-    public ResponseEntity<List<Expense>> getAllExpensesAsc() {
-        List<Expense> expenses = expenseService.getAllExpensesAscendingOrder();
+    public ResponseEntity<List<Expense>> getAllExpensesAsc(@RequestParam int userId) {
+        List<Expense> expenses = expenseService.getAllExpensesAscendingOrder(userId);
         return ResponseEntity.ok().body(expenses);
     }
+
     @PostMapping("/add-category")
     public ResponseEntity<?> addExpenseCategory(@RequestBody Map<String, String> requestBody) {
         String categoryName = requestBody.get("categoryName");
@@ -132,26 +138,39 @@ public class ExpenseController {
         return ResponseEntity.ok().body(categories);
     }
 
+    //tested
     @GetMapping("/expenses-by-category/{categoryId}")
-    public ResponseEntity<List<Expense>> getExpensesByCategory(@PathVariable("categoryId") Long categoryId) {
+    public ResponseEntity<List<Expense>> getExpensesByCategory(
+            @PathVariable("categoryId") Long categoryId,
+            @RequestParam int userId) {
+
         Optional<ExpenseCategory> expenseCategory = expenseCategoryRepository.findById(Math.toIntExact(categoryId));
 
         if (!expenseCategory.isPresent()) {
             return ResponseEntity.notFound().build();
         }
 
-        List<Expense> expenses = expenseService.getExpensesByExpenseCategory(expenseCategory.get());
+        List<Expense> expenses = expenseService.getExpensesByExpenseCategory(expenseCategory.get(), userId);
         return ResponseEntity.ok(expenses);
     }
 
+
     @GetMapping("/filter-by-amount")
-    public ResponseEntity<List<Expense>> filterExpensesByAmountRange(@RequestParam("from") float fromAmount,
-                                                                   @RequestParam("to") float toAmount) {
-        if (fromAmount > toAmount) {
+    public ResponseEntity<List<Expense>> filterExpensesByAmountRange(
+            @RequestParam("from") float fromAmount,
+            @RequestParam(value = "to", required = false) Float toAmount,
+            @RequestParam int userId) {
+
+        if (toAmount != null && fromAmount > toAmount) {
             return ResponseEntity.badRequest().body(Collections.emptyList());
         }
 
-        List<Expense> filteredExpenses = expenseService.filterExpensesByAmountRange(fromAmount, toAmount);
+        List<Expense> filteredExpenses;
+        if (toAmount != null) {
+            filteredExpenses = expenseService.filterExpensesByAmountRange(userId, fromAmount, toAmount);
+        } else {
+            filteredExpenses = expenseService.filterExpensesByAmountStartingFrom(userId, fromAmount);
+        }
 
         return ResponseEntity.ok().body(filteredExpenses);
     }

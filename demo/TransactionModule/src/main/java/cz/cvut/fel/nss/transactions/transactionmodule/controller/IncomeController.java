@@ -3,8 +3,10 @@ import cz.cvut.fel.nss.transactions.transactionmodule.dto.IncomeDTO;
 import cz.cvut.fel.nss.transactions.transactionmodule.entity.Expense;
 import cz.cvut.fel.nss.transactions.transactionmodule.entity.Income;
 import cz.cvut.fel.nss.transactions.transactionmodule.entity.IncomeCategory;
+import cz.cvut.fel.nss.transactions.transactionmodule.entity.elasticentity.TransactionDocument;
 import cz.cvut.fel.nss.transactions.transactionmodule.repository.IncomeCategoryRepository;
 import cz.cvut.fel.nss.transactions.transactionmodule.repository.IncomeRepository;
+
 import cz.cvut.fel.nss.transactions.transactionmodule.service.IncomeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,8 +36,11 @@ public class IncomeController {
     @Autowired
     private IncomeRepository incomeRepository;
 
+
+
+
     @PostMapping("/add-income")
-    public ResponseEntity<?> addIncome(@RequestBody IncomeDTO incomeDto) {
+    public ResponseEntity<?> addIncome(@RequestBody IncomeDTO incomeDto, @RequestParam int userId) {
         IncomeCategory incomeCategory = incomeDto.getIncomeCategory();
         Long incomeCategoryId = incomeDto.getIncomeCategory().getId();
 
@@ -45,10 +50,6 @@ public class IncomeController {
         if (optionalIncomeCategory.isPresent()) {
             IncomeCategory retrievedCategory = optionalIncomeCategory.get();
 
-            //System.out.println("retrieved category"+retrievedCategory.getCategoryName());
-            //System.out.println("retrieved id"+retrievedCategory.getId()+" /n");
-            //System.out.println("dto category"+incomeDto.getIncomeCategory().getCategoryName());
-            //System.out.println("dto id"+incomeDto.getId());
             if (!retrievedCategory.getCategoryName().equals(incomeCategory.getCategoryName())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid category name for the given id");
             }
@@ -65,6 +66,7 @@ public class IncomeController {
         }
 
         Income income = new Income();
+        income.setUserId(userId);
         income.setAmount(incomeDto.getAmount());
         income.setName(incomeDto.getName());
         income.setTransactionDate(incomeDto.getTransactionDate());
@@ -75,28 +77,28 @@ public class IncomeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateIncome(@PathVariable("id") int id, @RequestBody Income updatedIncome) {
+    public ResponseEntity<?> updateIncome(@PathVariable("id") int id, @RequestBody Income updatedIncome,  @RequestParam int userId) {
         if (!incomeRepository.existsById(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Income with id " + id + " not found");
         }
         updatedIncome.setId(id);
-        incomeService.updateIncome(updatedIncome);
+        incomeService.updateIncome(updatedIncome, userId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteIncome(@PathVariable("id") int id) {
+    public ResponseEntity<?> deleteIncome(@PathVariable("id") int id, @RequestParam int userId) {
         if (!incomeRepository.existsById(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Income with id " + id + " not found");
         }
-        incomeService.deleteIncome(id);
+        incomeService.deleteIncome(id, userId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getIncomeById(@PathVariable("id") int id) {
+    public ResponseEntity<?> getIncomeById(@PathVariable("id") int id, @RequestParam int userId) {
         try {
-            Income income = incomeService.getIncomeById(id);
+            Income income = incomeService.getIncomeById(id, userId);
             if (income == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Income with id " + id + " not found");
             }
@@ -106,15 +108,20 @@ public class IncomeController {
         }
     }
 
+    /////////////////////////////////////////////////////////////
+
+
+    //tested
     @GetMapping("/all_incomes_desc")
-    public ResponseEntity<List<Income>> getAllIncomesDesc() {
-        List<Income> incomes = incomeService.getAllExpensesDescendingOrder();
+    public ResponseEntity<List<Income>> getAllIncomesDesc(@RequestParam int userId) {
+        List<Income> incomes = incomeService.getAllExpensesDescendingOrder(userId);
         return ResponseEntity.ok().body(incomes);
     }
 
+    //tested
     @GetMapping("/all_incomes_asc")
-    public ResponseEntity<List<Income>> getAllIncomesAsc() {
-        List<Income> incomes = incomeService.getAllExpensesAscendingOrder();
+    public ResponseEntity<List<Income>> getAllIncomesAsc(@RequestParam int userId) {
+        List<Income> incomes = incomeService.getAllExpensesAscendingOrder(userId);
         return ResponseEntity.ok().body(incomes);
     }
 
@@ -131,34 +138,29 @@ public class IncomeController {
         return ResponseEntity.ok().body(categories);
     }
 
+
     @GetMapping("/incomes-by-category/{categoryId}")
-    public ResponseEntity<List<Income>> getIncomesByCategory(@PathVariable("categoryId") Long categoryId) {
+    public ResponseEntity<List<Income>> getIncomesByCategory(
+            @PathVariable("categoryId") Long categoryId,
+            @RequestParam int userId) {
+
         Optional<IncomeCategory> incomeCategory = incomeCategoryRepository.findById(Math.toIntExact(categoryId));
 
         if (!incomeCategory.isPresent()) {
             return ResponseEntity.notFound().build();
         }
 
-        List<Income> incomes = incomeService.getIncomesByIncomeCategory(incomeCategory.get());
+        List<Income> incomes = incomeService.getIncomesByIncomeCategoryAndUserId(incomeCategory.get(), userId);
         return ResponseEntity.ok(incomes);
     }
 
-//    @GetMapping("/filter-by-amount")
-//    public ResponseEntity<List<Income>> filterIncomesByAmountRange(@RequestParam("from") float fromAmount,
-//                                                                   @RequestParam("to") float toAmount) {
-//        if (fromAmount > toAmount) {
-//            return ResponseEntity.badRequest().body(Collections.emptyList());
-//        }
-//
-//        List<Income> filteredIncomes = incomeService.filterIncomesByAmountRange(fromAmount, toAmount);
-//
-//        return ResponseEntity.ok().body(filteredIncomes);
-//    }
 
+    //tested
     @GetMapping("/filter-by-amount")
     public ResponseEntity<List<Income>> filterIncomesByAmountRange(
             @RequestParam("from") float fromAmount,
-            @RequestParam(value = "to", required = false) Float toAmount) {
+            @RequestParam(value = "to", required = false) Float toAmount,
+            @RequestParam int userId) {
 
         if (toAmount != null && fromAmount > toAmount) {
             return ResponseEntity.badRequest().body(Collections.emptyList());
@@ -166,13 +168,18 @@ public class IncomeController {
 
         List<Income> filteredIncomes;
         if (toAmount != null) {
-            filteredIncomes = incomeService.filterIncomesByAmountRange(fromAmount, toAmount);
+            filteredIncomes = incomeService.filterIncomesByAmountRange(userId, fromAmount, toAmount);
         } else {
-            filteredIncomes = incomeService.filterIncomesByAmountStartingFrom(fromAmount);
+            filteredIncomes = incomeService.filterIncomesByAmountStartingFrom(userId, fromAmount);
         }
 
         return ResponseEntity.ok().body(filteredIncomes);
     }
+
+//    @GetMapping("/search")
+//    public List<TransactionDocument> searchTransactions(@RequestParam String searchTerm) {
+//        return incomeService.searchTransactions(searchTerm);
+//    }
 
 
 }

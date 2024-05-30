@@ -9,11 +9,16 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name="goal")
-public class Goal extends Finance{
+public class Goal extends Finance {
 
+    public GoalMementoEntity saveToMemento() {
+        return new GoalMementoEntity(getId(), getUserId(), getName(), getAmount());
+    }
 
-
-//    @Column(name = "recurrence")
-//    private Recurrence recurrence;
-
+    public void restoreFromMemento(GoalMementoEntity memento) {
+        setId(Math.toIntExact(memento.getId()));
+        setUserId(memento.getUserId());
+        setName(memento.getName());
+        setAmount(memento.getAmount());
+    }
 }

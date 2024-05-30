@@ -5,11 +5,14 @@ package cz.cvut.fel.nss.transactions.transactionmodule.service;
 import cz.cvut.fel.nss.transactions.transactionmodule.entity.*;
 import cz.cvut.fel.nss.transactions.transactionmodule.repository.ExpenseCategoryRepository;
 import cz.cvut.fel.nss.transactions.transactionmodule.repository.ExpenseRepository;
+
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -17,21 +20,27 @@ public class ExpenseService  {
     private final ExpenseRepository expenseRepository;
     private final ExpenseCategoryRepository expenseCategoryRepository;
 
+//    public ExpenseService(ExpenseRepository expenseRepository, ExpenseCategoryRepository expenseCategoryRepository, ElasticsearchOperations elasticsearchTemplate
+//            , TransactionSearchRepository transactionSearchRepository) {
+//        this.expenseRepository = expenseRepository;
+//        this.expenseCategoryRepository = expenseCategoryRepository;
+//        this.elasticsearchTemplate = elasticsearchTemplate;
+//        this.transactionSearchRepository = transactionSearchRepository;
+//    }
+
     public ExpenseService(ExpenseRepository expenseRepository, ExpenseCategoryRepository expenseCategoryRepository) {
         this.expenseRepository = expenseRepository;
         this.expenseCategoryRepository = expenseCategoryRepository;
     }
-
-
-    public Expense getExpenseById(int expenseId) {
-        return expenseRepository.findById(expenseId)
-                .orElseThrow(() -> new RuntimeException("Expense not found with id: " + expenseId));
+    public Expense getExpenseById(int expenseId, int userId) {
+        Optional<Expense> optionalExpense = expenseRepository.findByIdAndUserId(expenseId, userId);
+        return optionalExpense.orElseThrow(() -> new RuntimeException("Expense not found with id: " + expenseId + " for user: " + userId));
     }
 
     @Transactional
-    public void updateExpense(Expense updatedExpense) {
+    public void updateExpense(Expense updatedExpense, int userId) {
         Objects.requireNonNull(updatedExpense);
-        Expense existingExpense = getExpenseById(updatedExpense.getId());
+        Expense existingExpense = getExpenseById(updatedExpense.getId(), userId);
         existingExpense.setAmount(updatedExpense.getAmount());
         existingExpense.setName(updatedExpense.getName());
         existingExpense.setTransactionDate(updatedExpense.getTransactionDate());
@@ -46,8 +55,8 @@ public class ExpenseService  {
     }
 
     @Transactional
-    public void deleteExpense(int expenseId) {
-        getExpenseById(expenseId);
+    public void deleteExpense(int expenseId, int userId) {
+        getExpenseById(expenseId, userId);
         expenseRepository.deleteById(expenseId);
     }
 
@@ -57,7 +66,6 @@ public class ExpenseService  {
     }
 
     public void addExpenseCategory(String categoryName) {
-        // Create a new IncomeCategory
         ExpenseCategory expenseCategory = new ExpenseCategory();
         expenseCategory.setCategoryName(categoryName);
         expenseCategoryRepository.save(expenseCategory);
@@ -68,19 +76,29 @@ public class ExpenseService  {
         return expenseCategoryRepository.findAll();
     }
 
-    public List<Expense> getExpensesByExpenseCategory(ExpenseCategory expenseCategory) {
-        return expenseRepository.findByExpenseCategory(expenseCategory);
+    public List<Expense> getExpensesByExpenseCategory(ExpenseCategory expenseCategory, int userId) {
+        return expenseRepository.findByExpenseCategoryAndUserId(expenseCategory, userId);
     }
 
-    public List<Expense> getAllExpensesDescendingOrder() {
-        return expenseRepository.findAllByOrderByTransactionDateDesc();
+    public List<Expense> getAllExpensesDescendingOrder(int userId) {
+        return expenseRepository.findAllByOrderByTransactionDateDesc(userId);
     }
 
-    public List<Expense> getAllExpensesAscendingOrder() {
-        return expenseRepository.findAllByOrderByTransactionDateAsc();
+    public List<Expense> getAllExpensesAscendingOrder(int userId) {
+        return expenseRepository.findAllByOrderByTransactionDateAsc(userId);
     }
 
-    public List<Expense> filterExpensesByAmountRange(float fromAmount, float toAmount) {
-        return expenseRepository.findByAmountBetweenOrderByAmountAsc(fromAmount, toAmount);
+    public List<Expense> filterExpensesByAmountRange(int userId, float fromAmount, float toAmount) {
+        return expenseRepository.findByAmountBetweenOrderByAmountAsc(userId, fromAmount, toAmount);
     }
+
+    @Transactional(readOnly = true)
+    public List<Expense> getExpensesByExpenseCategoryAndUserId(ExpenseCategory expenseCategory, int userId) {
+        return expenseRepository.findByExpenseCategoryAndUserId(expenseCategory, userId);
+    }
+
+    public List<Expense> filterExpensesByAmountStartingFrom(int userId, float fromAmount) {
+        return expenseRepository.findByAmountGreaterThanEqualOrderByAmountAsc(userId, fromAmount);
+    }
+
 }

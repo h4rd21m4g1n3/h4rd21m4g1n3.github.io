@@ -4,6 +4,7 @@ import cz.cvut.fel.nss.transactions.transactionmodule.entity.Expense;
 import cz.cvut.fel.nss.transactions.transactionmodule.entity.Income;
 import cz.cvut.fel.nss.transactions.transactionmodule.entity.Transaction;
 
+import cz.cvut.fel.nss.transactions.transactionmodule.entity.elasticentity.TransactionDocument;
 import cz.cvut.fel.nss.transactions.transactionmodule.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/transactions")
-//@Tag(name = "Transactions", description = "")
 public class TransactionController {
 
     private final TransactionService transactionService;
@@ -26,47 +26,33 @@ public class TransactionController {
     }
 
 
+    //tested
     @GetMapping("/{id}")
-    public ResponseEntity<Transaction> getTransactionById(@PathVariable("id") int id) {
-        Transaction transaction = transactionService.getTransactionById(id);
+    public ResponseEntity<Transaction> getTransactionById(@PathVariable("id") int id,  @RequestParam int userId) {
+        Transaction transaction = transactionService.getTransactionById(id, userId);
         return ResponseEntity.ok().body(transaction);
     }
 
+    //not working???
     @GetMapping("/all_transactions_desc")
-    public ResponseEntity<List<Transaction>> getAllTransactionsDesc() {
-        List<Transaction> transactions = transactionService.getAllExpensesDescendingOrder();
+    public ResponseEntity<List<Transaction>> getAllTransactionsDesc(@RequestParam int userId) {
+        List<Transaction> transactions = transactionService.getAllExpensesDescendingOrder(userId);
         return ResponseEntity.ok().body(transactions);
     }
 
+    //not working???
     @GetMapping("/all_transactions_asc")
-    public ResponseEntity<List<Transaction>> getAllTransactionsAsc() {
-        List<Transaction> transactions = transactionService.getAllExpensesAscendingOrder();
+    public ResponseEntity<List<Transaction>> getAllTransactionsAsc(@RequestParam int userId) {
+        List<Transaction> transactions = transactionService.getAllExpensesAscendingOrder(userId);
         return ResponseEntity.ok().body(transactions);
     }
-//    @PostMapping
-//    public ResponseEntity<?> createTransaction(@RequestBody Transaction transaction) {
-//        transactionService.createTransaction(transaction);
-//        return ResponseEntity.status(HttpStatus.CREATED).build();
-//    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateTransaction(@PathVariable("id") int id, @RequestBody Transaction updatedTransaction) {
-        updatedTransaction.setId(id);
-        transactionService.updateTransaction(updatedTransaction);
-        return ResponseEntity.ok().build();
-    }
 
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTransaction(@PathVariable("id") int id) {
-        transactionService.deleteTransaction(id);
-        return ResponseEntity.noContent().build();
-    }
 
-
+    //tested
     @GetMapping("/all")
-    public ResponseEntity<List<Transaction>> getAllTransactions() {
-        List<Transaction> transactions = transactionService.getAllTransactions();
+    public ResponseEntity<List<Transaction>> getAllTransactions(@RequestParam int userId) {
+        List<Transaction> transactions = transactionService.getAllTransactions(userId);
         return ResponseEntity.ok().body(transactions);
     }
 
@@ -82,4 +68,9 @@ public class TransactionController {
 
         return ResponseEntity.ok().body(filteredTransactions);
     }
+
+//    @GetMapping("/search")
+//    public List<TransactionDocument> searchTransactions(@RequestParam String searchTerm) {
+//        return transactionService.searchTransactions(searchTerm);
+//    }
 }
