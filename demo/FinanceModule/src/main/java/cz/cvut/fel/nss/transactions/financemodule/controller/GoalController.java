@@ -10,11 +10,9 @@ import cz.cvut.fel.nss.transactions.financemodule.entity.GoalMementoEntity;
 import cz.cvut.fel.nss.transactions.financemodule.kafka.dto.TransactionInfoDto;
 import cz.cvut.fel.nss.transactions.financemodule.repository.GoalRepository;
 import cz.cvut.fel.nss.transactions.financemodule.service.GoalService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,9 +24,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+
+@Slf4j
 @RestController
 @RequestMapping("/finances/goals")
-@CacheConfig(cacheNames = "goals")
 public class GoalController {
 
     private final GoalService goalService;
@@ -44,7 +43,7 @@ public class GoalController {
 
     //tested
     @GetMapping("/{id}")
-    @Cacheable(key = "#id")
+    @Cacheable(value = "goals", key = "#id")
     public ResponseEntity<?> getGoalById(@PathVariable("id") int id, @RequestParam int userId) {
         try {
             Goal goal = goalService.getGoalById(id, userId);
@@ -72,7 +71,7 @@ public class GoalController {
 
     //tested
     @PutMapping("/{id}")
-    @CachePut(key = "#id")
+    @CacheEvict(value = "goals", key = "#id")
     public ResponseEntity<?> updateGoal(@PathVariable("id") int id, @RequestBody Goal updatedGoal,  @RequestParam int userId) {
         if (!goalRepository.existsById(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Goal with id " + id + " not found.");
@@ -84,7 +83,7 @@ public class GoalController {
 
 
     @DeleteMapping("/{id}")
-    @CacheEvict(key = "#id")
+    @CacheEvict(value = "goals", key = "#id")
     public ResponseEntity<?> deleteGoal(@PathVariable("id") int id, @RequestParam int userId) {
         if (!goalRepository.existsById(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Goal with id " + id + " not found");

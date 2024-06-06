@@ -10,6 +10,9 @@ import cz.cvut.fel.nss.transactions.financemodule.memento.GoalCaretaker;
 import cz.cvut.fel.nss.transactions.financemodule.repository.GoalRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +37,6 @@ public class GoalService {
         this.caretaker = caretaker;
     }
 
-
     public Goal getGoalById(int goalId, int userId){
         Optional<Goal> optionalIncome = goalRepository.findByIdAndUserId(goalId, userId);
         return optionalIncome.orElseThrow(() -> new RuntimeException("Goal not found with id: " + goalId + " for user: " + userId));
@@ -48,6 +50,7 @@ public class GoalService {
     }
 
     @Transactional
+    @CachePut(value = "goals", key = "#updatedGoal.id")
     public void updateGoal(Goal updatedGoal, int userId) {
         Objects.requireNonNull(updatedGoal);
         Goal existingGoal = getGoalById(updatedGoal.getId(), userId);
@@ -61,10 +64,11 @@ public class GoalService {
     }
 
     @Transactional
-    public void deleteGoal(int incomeId, int userId) {
-        getGoalById(incomeId, userId);
-        goalRepository.deleteById(incomeId);
+    public void deleteGoal(int goalId, int userId) {
+        getGoalById(goalId, userId);
+        goalRepository.deleteById(goalId);
     }
+
 
 
     public List<Goal> getAllGoals(int userId) {
