@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 
 @RestController
@@ -43,6 +44,19 @@ public class DebtController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Debt with id " + id + " not found");
             }
             return ResponseEntity.ok().body(debt);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error occurred");
+        }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllDebtById( @RequestParam int userId) {
+        try {
+            List<Debt> debts = debtService.getAllById(userId);
+            if (debts.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Debts was not fount");
+            }
+            return ResponseEntity.ok().body(debts);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error occurred");
         }

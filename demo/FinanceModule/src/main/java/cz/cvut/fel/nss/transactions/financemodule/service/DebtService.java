@@ -6,6 +6,7 @@ import cz.cvut.fel.nss.transactions.financemodule.repository.DebtRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -21,6 +22,11 @@ public class DebtService {
     public Debt getDebtById(int debtId, int userId){
         Optional<Debt> optionalIncome = debtRepository.findByIdAndUserId(debtId, userId);
         return optionalIncome.orElseThrow(() -> new RuntimeException("Debt not found with id: " + debtId + " for user: " + userId));
+    }
+
+    public List<Debt> getAllById(int userId){
+        List<Debt> optionalIncome = debtRepository.findAllByUserId( userId);
+        return optionalIncome;
     }
 
     @Transactional
