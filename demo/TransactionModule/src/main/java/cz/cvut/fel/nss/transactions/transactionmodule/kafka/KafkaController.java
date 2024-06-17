@@ -16,6 +16,12 @@ public class KafkaController {
         this.kafkaProducer = kafkaProducer;
     }
 
+    /**
+     * Endpoint to publish a message to a Kafka topic.
+     *
+     * @param transactionInfoDto the transaction information to be sent
+     * @return a response indicating the status of the message sending
+     */
     @PostMapping("/publish")
     public ResponseEntity<String> sendMessageToKafkaTopic(@RequestBody TransactionInfoDto transactionInfoDto) {
         kafkaProducer.sendMessage(transactionInfoDto);

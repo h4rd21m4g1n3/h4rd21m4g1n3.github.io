@@ -19,15 +19,9 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
 
 //    @Autowired
-//    private ElasticsearchRestTemplate elasticsearchTemplate; // Change the variable name to match the bean name
+//    private ElasticsearchRestTemplate elasticsearchTemplate;
 //    private final TransactionSearchRepository transactionSearchRepository;
 
-
-//    @Autowired
-//    public TransactionService(TransactionRepository transactionRepository, TransactionSearchRepository transactionSearchRepository) {
-//        this.transactionRepository = transactionRepository;
-//        this.transactionSearchRepository = transactionSearchRepository;
-//    }
 
     @Autowired
     public TransactionService(TransactionRepository transactionRepository) {
@@ -35,12 +29,25 @@ public class TransactionService {
 
     }
 
+    /**
+     * Retrieves a transaction by its ID and user ID.
+     *
+     * @param transactionId the ID of the transaction
+     * @param userId the ID of the user
+     * @return the transaction with the given ID and user ID
+     * @throws RuntimeException if the transaction is not found
+     */
     public Transaction getTransactionById(int transactionId, int userId) {
         Optional<Transaction> optionalTransaction = transactionRepository.findByIdAndUserId(transactionId, userId);
         return optionalTransaction.orElseThrow(() -> new RuntimeException("Transaction not found with id: " + transactionId + " for user: " + userId));
     }
 
 
+    /**
+     * Creates a new transaction.
+     *
+     * @param transaction the transaction to be created
+     */
     @Transactional
     public void createTransaction(Transaction transaction){
         Objects.requireNonNull(transaction);
@@ -50,6 +57,7 @@ public class TransactionService {
             } else {
                 transactionRepository.save(transaction);
 
+                //elastic search doesnt work :- (
                 //TransactionDocument transactionDocument = convertToTransactionDocument(transaction);
                 //transactionSearchRepository.save(transactionDocument);
             }
@@ -58,6 +66,12 @@ public class TransactionService {
         }
     }
 
+    /**
+     * Converts a Transaction object to a TransactionDocument object.
+     *
+     * @param transaction the transaction to be converted
+     * @return the corresponding TransactionDocument object
+     */
     private TransactionDocument convertToTransactionDocument(Transaction transaction) {
         TransactionDocument transactionDocument = new TransactionDocument();
         transactionDocument.setId(String.valueOf(transaction.getId()));
@@ -68,27 +82,52 @@ public class TransactionService {
         return transactionDocument;
     }
 
+    /**
+     * Retrieves all transactions in descending order by transaction date for a user.
+     *
+     * @param userId the ID of the user
+     * @return a list of transactions in descending order by transaction date
+     */
     public List<Transaction> getAllExpensesDescendingOrder(int userId) {
         return transactionRepository.findAllByOrderByTransactionDateDesc(userId);
     }
 
+    /**
+     * Retrieves all transactions in ascending order by transaction date for a user.
+     *
+     * @param userId the ID of the user
+     * @return a list of transactions in ascending order by transaction date
+     */
     public List<Transaction> getAllExpensesAscendingOrder(int userId) {
         return transactionRepository.findAllByOrderByTransactionDateAsc(userId);
     }
 
+    /**
+     * Updates an existing transaction.
+     *
+     * @param updatedTransaction the updated transaction data
+     * @param userId the ID of the user
+     * @return the updated transaction
+     */
     @Transactional
     public Transaction updateTransaction(Transaction updatedTransaction, int userId) {
         Objects.requireNonNull(updatedTransaction);
         Transaction existingTransaction = getTransactionById(updatedTransaction.getId(), userId);
         transactionRepository.save(existingTransaction);
 
-        // Convert Transaction to TransactionDocument and update Elasticsearch
+        //elastic search doesnt work :- (
         //TransactionDocument transactionDocument = convertToTransactionDocument(existingTransaction);
         //transactionSearchRepository.save(transactionDocument);
 
         return existingTransaction;
     }
 
+    /**
+     * Deletes a transaction by its ID and user ID.
+     *
+     * @param transactionId the ID of the transaction
+     * @param userId the ID of the user
+     */
     @Transactional
     public void deleteTransaction(int transactionId, int userId) {
         getTransactionById(transactionId, userId);
@@ -96,10 +135,23 @@ public class TransactionService {
     }
 
 
+    /**
+     * Retrieves all transactions for a user.
+     *
+     * @param userId the ID of the user
+     * @return a list of all transactions for the user
+     */
     public List<Transaction> getAllTransactions(int userId) {
         return transactionRepository.findAllByUserId(userId);
     }
 
+    /**
+     * Filters transactions by amount range.
+     *
+     * @param fromAmount the minimum amount
+     * @param toAmount the maximum amount
+     * @return a list of transactions within the specified amount range
+     */
     public List<Transaction> filterTransactionsByAmountRange(float fromAmount, float toAmount) {
         return transactionRepository.findByAmountBetweenOrderByAmountAsc(fromAmount, toAmount);
     }

@@ -8,6 +8,10 @@ import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
+
+/**
+ * Configuration class for setting up Elasticsearch in the Spring context.
+ */
 @Configuration
 @ComponentScan(basePackages = { "cz.cvut.fel.nss.transactions.transactionmodule.service" })
 @EnableElasticsearchRepositories(basePackages = "cz.cvut.fel.nss.transactions.transactionmodule.repository.elastic")

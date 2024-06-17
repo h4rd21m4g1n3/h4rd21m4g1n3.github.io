@@ -3,8 +3,11 @@ package cz.cvut.fel.nss.transactions.transactionmodule.kafka.dto;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.Date;
 
+
+/**
+ * Data Transfer Object (DTO) for transaction information.
+ */
 @Data
 
 public class TransactionInfoDto {

@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-
+/**
+ * Represents a category of expenses.
+ */
 @Getter
 @Setter
 @Entity

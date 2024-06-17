@@ -7,6 +7,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * Configuration class for setting up interceptors in the Spring MVC context.
+ */
 @Configuration
 public class InterceptorConfig implements WebMvcConfigurer {
 
@@ -16,6 +19,11 @@ public class InterceptorConfig implements WebMvcConfigurer {
     @Autowired
     private IncomeInterceptor incomeInterceptor;
 
+    /**
+     * Adds interceptors to the registry.
+     *
+     * @param registry the interceptor registry
+     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(generalInterseptor).addPathPatterns("/transactions/expenses/**");

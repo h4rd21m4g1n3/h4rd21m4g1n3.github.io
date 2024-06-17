@@ -17,13 +17,13 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Service class for managing incomes and income categories.
+ */
 @Service
 @Transactional
 public class IncomeService  {
@@ -31,31 +31,42 @@ public class IncomeService  {
     private final IncomeRepository incomeRepository;
     private final IncomeCategoryRepository incomeCategoryRepository;
 
-    //@Autowired
-    //private ElasticsearchRestTemplate elasticsearchTemplate;
+    public IncomeService(IncomeRepository incomeRepository, IncomeCategoryRepository incomeCategoryRepository) {
+        this.incomeRepository = incomeRepository;
+        this.incomeCategoryRepository = incomeCategoryRepository;
+    }
 
-//    public IncomeService(IncomeRepository incomeRepository, IncomeCategoryRepository incomeCategoryRepository
-//            , TransactionSearchRepository transactionSearchRepository) {
-//        this.incomeRepository = incomeRepository;
-//        this.incomeCategoryRepository = incomeCategoryRepository;
-//        this.transactionSearchRepository = transactionSearchRepository;
-//    }
-public IncomeService(IncomeRepository incomeRepository, IncomeCategoryRepository incomeCategoryRepository) {
-    this.incomeRepository = incomeRepository;
-    this.incomeCategoryRepository = incomeCategoryRepository;
-}
-
-
+    /**
+     * Adds a new income category.
+     *
+     * @param categoryName the name of the new income category
+     */
     public void addIncomeCategory(String categoryName) {
         IncomeCategory incomeCategory = new IncomeCategory();
         incomeCategory.setCategoryName(categoryName);
         incomeCategoryRepository.save(incomeCategory);
     }
+
+    /**
+     * Retrieves an income by its ID and user ID.
+     *
+     * @param incomeId the ID of the income
+     * @param userId the ID of the user
+     * @return the income with the given ID and user ID
+     * @throws RuntimeException if the income is not found
+     */
     public Income getIncomeById(int incomeId, int userId) {
         Optional<Income> optionalIncome = incomeRepository.findByIdAndUserId(incomeId, userId);
         return optionalIncome.orElseThrow(() -> new RuntimeException("Income not found with id: " + incomeId + " for user: " + userId));
     }
 
+
+    /**
+     * Updates an existing income.
+     *
+     * @param updatedIncome the updated income data
+     * @param userId the ID of the user
+     */
     @Transactional
     public void updateIncome(Income updatedIncome, int userId) {
         Objects.requireNonNull(updatedIncome);
@@ -66,6 +77,12 @@ public IncomeService(IncomeRepository incomeRepository, IncomeCategoryRepository
         existingIncome.setIncomeCategory(updatedIncome.getIncomeCategory());
         incomeRepository.save(existingIncome);
     }
+
+    /**
+     * Creates a new income.
+     *
+     * @param income the income to be created
+     */
     @Transactional
     public void createIncome(Income income){
         Objects.requireNonNull(income);
@@ -84,6 +101,12 @@ public IncomeService(IncomeRepository incomeRepository, IncomeCategoryRepository
         return transactionDocument;
     }
 
+    /**
+     * Deletes an income by its ID and user ID.
+     *
+     * @param incomeId the ID of the income
+     * @param userId the ID of the user
+     */
     @Transactional
     public void deleteIncome(int incomeId, int userId) {
         getIncomeById(incomeId, userId);
@@ -95,36 +118,82 @@ public IncomeService(IncomeRepository incomeRepository, IncomeCategoryRepository
         return incomeRepository.findByIncomeCategoryAndUserId(incomeCategory, userId);
     }
 
+    /**
+     * Retrieves all incomes.
+     *
+     * @return a list of all incomes
+     */
     @Transactional(readOnly = true)
     public List<Income> getAllIncomes() {
         return incomeRepository.findAll();
     }
 
+    /**
+     * Retrieves all income categories.
+     *
+     * @return a list of all income categories
+     */
     @Transactional(readOnly = true)
     public List<IncomeCategory> getAllIncomeCategories() {
         return incomeCategoryRepository.findAll();
     }
 
+    /**
+     * Retrieves incomes by income category.
+     *
+     * @param incomeCategory the income category
+     * @return a list of incomes in the specified category
+     */
     public List<Income> getIncomesByIncomeCategory(IncomeCategory incomeCategory) {
         return incomeRepository.findByIncomeCategory(incomeCategory);
     }
 
+    /**
+     * Retrieves all incomes in descending order by transaction date for a user.
+     *
+     * @param userId the ID of the user
+     * @return a list of incomes in descending order by transaction date
+     */
     public List<Income> getAllExpensesDescendingOrder(int userId) {
         return incomeRepository.findAllByOrderByTransactionDateDesc(userId);
     }
 
+    /**
+     * Retrieves all incomes in ascending order by transaction date for a user.
+     *
+     * @param userId the ID of the user
+     * @return a list of incomes in ascending order by transaction date
+     */
     public List<Income> getAllExpensesAscendingOrder(int userId) {
         return incomeRepository.findAllByOrderByTransactionDateAsc(userId);
     }
 
+    /**
+     * Filters incomes by amount range for a user.
+     *
+     * @param userId the ID of the user
+     * @param fromAmount the minimum amount
+     * @param toAmount the maximum amount
+     * @return a list of incomes within the specified amount range
+     */
     public List<Income> filterIncomesByAmountRange(int userId, float fromAmount, float toAmount) {
         return incomeRepository.findByAmountBetweenOrderByAmountAsc(userId, fromAmount, toAmount);
     }
 
+    /**
+     * Filters incomes by amount starting from a specified value for a user.
+     *
+     * @param userId the ID of the user
+     * @param fromAmount the minimum amount
+     * @return a list of incomes with amount greater than or equal to the specified value
+     */
     public List<Income> filterIncomesByAmountStartingFrom(int userId, float fromAmount) {
         return incomeRepository.findByAmountGreaterThanEqualOrderByAmountAsc(userId, fromAmount);
     }
 
+    /**
+     * WE TRIED TO MAKE ELASTIC SEARCH FOR 100 HOURS BUT IT DOESNT WORK :- (
+     */
     // Modify searchTransactions method to perform a fuzzy search on the name field
 //    public List<TransactionDocument> searchTransactions(String searchTerm) {
 //        Query searchQuery = new NativeSearchQueryBuilder()

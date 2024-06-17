@@ -6,6 +6,11 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
+
+/**
+ * Represents a generic transaction.
+ * This is an abstract class that is inherited by specific transaction types such as Income and Expense.
+ */
 @Getter
 @Setter
 @Entity

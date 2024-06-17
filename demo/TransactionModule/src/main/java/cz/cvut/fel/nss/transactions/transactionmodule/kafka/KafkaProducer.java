@@ -19,6 +19,11 @@ public class KafkaProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
+    /**
+     * Sends a message to the specified Kafka topic.
+     *
+     * @param transactionInfoDto the transaction information to be sent
+     */
     public void sendMessage(TransactionInfoDto transactionInfoDto) {
         logger.info("Producing message: {}", transactionInfoDto);
         kafkaTemplate.send(topic, transactionInfoDto);

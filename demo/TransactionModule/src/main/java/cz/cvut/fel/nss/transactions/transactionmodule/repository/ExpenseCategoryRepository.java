@@ -6,6 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ExpenseCategoryRepository extends JpaRepository<ExpenseCategory, Integer> {
-    // You can define additional methods specific to the ExpenseCategoryRepository here if needed
 }
 

@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * REST controller for managing incomes.
+ */
 @RestController
 @RequestMapping("/transactions/incomes")
 public class IncomeController {
@@ -37,8 +40,13 @@ public class IncomeController {
     private IncomeRepository incomeRepository;
 
 
-
-
+    /**
+     * Adds a new income.
+     *
+     * @param incomeDto the income data transfer object
+     * @param userId the ID of the user
+     * @return a response indicating the status of the request
+     */
     @PostMapping("/add-income")
     public ResponseEntity<?> addIncome(@RequestBody IncomeDTO incomeDto, @RequestParam int userId) {
         IncomeCategory incomeCategory = incomeDto.getIncomeCategory();
@@ -76,6 +84,14 @@ public class IncomeController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    /**
+     * Updates an existing income.
+     *
+     * @param id the ID of the income
+     * @param updatedIncome the updated income data
+     * @param userId the ID of the user
+     * @return a response indicating the status of the request
+     */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateIncome(@PathVariable("id") int id, @RequestBody Income updatedIncome,  @RequestParam int userId) {
         if (!incomeRepository.existsById(id)) {
@@ -86,6 +102,13 @@ public class IncomeController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Deletes an existing income.
+     *
+     * @param id the ID of the income
+     * @param userId the ID of the user
+     * @return a response indicating the status of the request
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteIncome(@PathVariable("id") int id, @RequestParam int userId) {
         if (!incomeRepository.existsById(id)) {
@@ -95,6 +118,13 @@ public class IncomeController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Retrieves an income by its ID and user ID.
+     *
+     * @param id the ID of the income
+     * @param userId the ID of the user
+     * @return the income with the given ID and user ID, or an error response if not found
+     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getIncomeById(@PathVariable("id") int id, @RequestParam int userId) {
         try {
@@ -111,20 +141,36 @@ public class IncomeController {
     /////////////////////////////////////////////////////////////
 
 
-    //tested
+    /**
+     * Retrieves all incomes in descending order by transaction date for a user.
+     *
+     * @param userId the ID of the user
+     * @return a list of incomes in descending order by transaction date
+     */
     @GetMapping("/all_incomes_desc")
     public ResponseEntity<List<Income>> getAllIncomesDesc(@RequestParam int userId) {
         List<Income> incomes = incomeService.getAllExpensesDescendingOrder(userId);
         return ResponseEntity.ok().body(incomes);
     }
 
-    //tested
+    /**
+     * Retrieves all incomes in ascending order by transaction date for a user.
+     *
+     * @param userId the ID of the user
+     * @return a list of incomes in ascending order by transaction date
+     */
     @GetMapping("/all_incomes_asc")
     public ResponseEntity<List<Income>> getAllIncomesAsc(@RequestParam int userId) {
         List<Income> incomes = incomeService.getAllExpensesAscendingOrder(userId);
         return ResponseEntity.ok().body(incomes);
     }
 
+    /**
+     * Adds a new income category.
+     *
+     * @param requestBody a map containing the category name
+     * @return a response indicating the status of the request
+     */
     @PostMapping("/add-category")
     public ResponseEntity<?> addIncomeCategory(@RequestBody Map<String, String> requestBody) {
         String categoryName = requestBody.get("categoryName");
@@ -132,6 +178,12 @@ public class IncomeController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+
+    /**
+     * Retrieves all income categories.
+     *
+     * @return a list of all income categories
+     */
     @GetMapping("/categories")
     public ResponseEntity<List<IncomeCategory>> getAllIncomeCategories() {
         List<IncomeCategory> categories = incomeService.getAllIncomeCategories();
@@ -139,6 +191,13 @@ public class IncomeController {
     }
 
 
+    /**
+     * Retrieves incomes by category ID and user ID.
+     *
+     * @param categoryId the ID of the income category
+     * @param userId the ID of the user
+     * @return a list of incomes in the specified category for the specified user
+     */
     @GetMapping("/incomes-by-category/{categoryId}")
     public ResponseEntity<List<Income>> getIncomesByCategory(
             @PathVariable("categoryId") Long categoryId,
@@ -155,7 +214,14 @@ public class IncomeController {
     }
 
 
-    //tested
+    /**
+     * Filters incomes by amount range for a user.
+     *
+     * @param fromAmount the minimum amount
+     * @param toAmount the maximum amount (optional)
+     * @param userId the ID of the user
+     * @return a list of incomes within the specified amount range
+     */
     @GetMapping("/filter-by-amount")
     public ResponseEntity<List<Income>> filterIncomesByAmountRange(
             @RequestParam("from") float fromAmount,
@@ -175,11 +241,6 @@ public class IncomeController {
 
         return ResponseEntity.ok().body(filteredIncomes);
     }
-
-//    @GetMapping("/search")
-//    public List<TransactionDocument> searchTransactions(@RequestParam String searchTerm) {
-//        return incomeService.searchTransactions(searchTerm);
-//    }
 
 
 }

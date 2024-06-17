@@ -6,6 +6,11 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
+
+
+/**
+ * Data Transfer Object (DTO) for income transactions.
+ */
 @Getter
 @Setter
 public class IncomeDTO {

@@ -30,6 +30,12 @@ public class KafkaProducerConfig {
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
+
+    /**
+     * Creates a KafkaTemplate with the producer factory.
+     *
+     * @return a configured KafkaTemplate
+     */
     @Bean
     public KafkaTemplate<String, TransactionInfoDto> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());

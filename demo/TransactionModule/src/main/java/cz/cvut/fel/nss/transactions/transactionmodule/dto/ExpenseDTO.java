@@ -6,6 +6,10 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
+
+/**
+ * Data Transfer Object (DTO) for expense transactions.
+ */
 @Getter
 @Setter
 public class ExpenseDTO {

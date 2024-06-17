@@ -30,6 +30,11 @@ public class KafkaTopicConfig {
     @Value(value = "${message.topic.name}")
     private String topic;
 
+    /**
+     * Creates a KafkaAdmin client with the necessary configurations.
+     *
+     * @return a configured KafkaAdmin client
+     */
     @Bean
     public KafkaAdmin kafkaAdmin() {
         Map<String, Object> configs = new HashMap<>();
@@ -37,6 +42,11 @@ public class KafkaTopicConfig {
         return new KafkaAdmin(configs);
     }
 
+    /**
+     * Creates a new Kafka topic with the specified name, number of partitions, and replication factor.
+     *
+     * @return a new Kafka topic
+     */
     @Bean
     public NewTopic topic1() {
         return new NewTopic(topic, 1, (short) 1);

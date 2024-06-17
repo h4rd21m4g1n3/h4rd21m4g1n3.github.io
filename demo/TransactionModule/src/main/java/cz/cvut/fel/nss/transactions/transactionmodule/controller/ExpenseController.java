@@ -22,9 +22,11 @@ import java.util.Map;
 import java.util.Optional;
 
 
-
+/**
+ * REST controller for managing expenses.
+ */
 @RestController
-    @RequestMapping("/transactions/expenses")
+@RequestMapping("/transactions/expenses")
 public class ExpenseController {
 
     private final ExpenseService expenseService;
@@ -40,6 +42,13 @@ public class ExpenseController {
     @Autowired
     private ExpenseRepository expenseRepository;
 
+    /**
+     * Adds a new expense.
+     *
+     * @param expenseDto the expense data transfer object
+     * @param userId the ID of the user
+     * @return a response indicating the status of the request
+     */
     @PostMapping("/add-expense")
     public ResponseEntity<?> addExpense(@RequestBody ExpenseDTO expenseDto, @RequestParam int userId) {
         ExpenseCategory expenseCategory = expenseDto.getExpenseCategory();
@@ -77,6 +86,14 @@ public class ExpenseController {
     }
 
 
+    /**
+     * Updates an existing expense.
+     *
+     * @param id the ID of the expense
+     * @param updatedExpense the updated expense data
+     * @param userId the ID of the user
+     * @return a response indicating the status of the request
+     */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateExpense(@PathVariable("id") int id, @RequestBody Expense updatedExpense,  @RequestParam int userId) {
         if (!expenseRepository.existsById(id)) {
@@ -87,6 +104,13 @@ public class ExpenseController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Deletes an existing expense.
+     *
+     * @param id the ID of the expense
+     * @param userId the ID of the user
+     * @return a response indicating the status of the request
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteExpense(@PathVariable("id") int id,  @RequestParam int userId) {
         if (!expenseRepository.existsById(id)) {
@@ -96,6 +120,13 @@ public class ExpenseController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Retrieves an expense by its ID and user ID.
+     *
+     * @param id the ID of the expense
+     * @param userId the ID of the user
+     * @return the expense with the given ID and user ID, or an error response if not found
+     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getExpenseById(@PathVariable("id") int id, @RequestParam int userId) {
         try {
@@ -111,20 +142,36 @@ public class ExpenseController {
 
     //////////////////////
 
-    //tested
+    /**
+     * Retrieves all expenses in descending order by transaction date for a user.
+     *
+     * @param userId the ID of the user
+     * @return a list of expenses in descending order by transaction date
+     */
     @GetMapping("/all_expenses_desc")
     public ResponseEntity<List<Expense>> getAllExpensesDesc(@RequestParam int userId) {
         List<Expense> expenses = expenseService.getAllExpensesDescendingOrder(userId);
         return ResponseEntity.ok().body(expenses);
     }
 
-    //tested
+    /**
+     * Retrieves all expenses in ascending order by transaction date for a user.
+     *
+     * @param userId the ID of the user
+     * @return a list of expenses in ascending order by transaction date
+     */
     @GetMapping("/all_expenses_asc")
     public ResponseEntity<List<Expense>> getAllExpensesAsc(@RequestParam int userId) {
         List<Expense> expenses = expenseService.getAllExpensesAscendingOrder(userId);
         return ResponseEntity.ok().body(expenses);
     }
 
+    /**
+     * Adds a new expense category.
+     *
+     * @param requestBody a map containing the category name
+     * @return a response indicating the status of the request
+     */
     @PostMapping("/add-category")
     public ResponseEntity<?> addExpenseCategory(@RequestBody Map<String, String> requestBody) {
         String categoryName = requestBody.get("categoryName");
@@ -132,13 +179,24 @@ public class ExpenseController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    /**
+     * Retrieves all expense categories.
+     *
+     * @return a list of all expense categories
+     */
     @GetMapping("/categories")
     public ResponseEntity<List<ExpenseCategory>> getAllExpenseCategories() {
         List<ExpenseCategory> categories = expenseService.getAllExpenseCategories();
         return ResponseEntity.ok().body(categories);
     }
 
-    //tested
+    /**
+     * Retrieves expenses by category ID and user ID.
+     *
+     * @param categoryId the ID of the expense category
+     * @param userId the ID of the user
+     * @return a list of expenses in the specified category for the specified user
+     */
     @GetMapping("/expenses-by-category/{categoryId}")
     public ResponseEntity<List<Expense>> getExpensesByCategory(
             @PathVariable("categoryId") Long categoryId,
@@ -155,6 +213,14 @@ public class ExpenseController {
     }
 
 
+    /**
+     * Filters expenses by amount range for a user.
+     *
+     * @param fromAmount the minimum amount
+     * @param toAmount the maximum amount (optional)
+     * @param userId the ID of the user
+     * @return a list of expenses within the specified amount range
+     */
     @GetMapping("/filter-by-amount")
     public ResponseEntity<List<Expense>> filterExpensesByAmountRange(
             @RequestParam("from") float fromAmount,

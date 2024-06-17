@@ -11,6 +11,9 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDate;
 
+/**
+ * Represents a transaction document stored in Elasticsearch.
+ */
 @Document(indexName = "transactions")
 @AllArgsConstructor
 @NoArgsConstructor

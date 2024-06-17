@@ -13,16 +13,5 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Goodbye world!");
         SpringApplication.run(Main.class, args);
-
-//        // Create an application context
-//        ApplicationContext context = new AnnotationConfigApplicationContext("cz.cvut.fel.nss.transactions.transactionmodule");
-//
-//        // Retrieve the IncomeService bean from the context
-//        IncomeService service = context.getBean(IncomeService.class);
-//
-//        // Now you can use the service
-//        // For example:
-//        // Transaction income = new Income();
-//        // service.createIncome(income);
     }
 }
