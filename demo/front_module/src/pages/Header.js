@@ -65,8 +65,6 @@ const Header = ({ isHomePage, searchQuery, handleSearchChange }) => {
                 {isLoggedIn ? (
                     <div className={popstyle['form-container']}>
                         Welcome, {username}!
-                        <a href="/cart" className={popstyle.signupLink}>Your cart</a>
-                        <a href="/reservation" className={popstyle.signupLink}>Your reservations</a>
                         <button onClick={logout} className={popstyle.logoutButton}>Logout</button>
                     </div>
                 ) : (

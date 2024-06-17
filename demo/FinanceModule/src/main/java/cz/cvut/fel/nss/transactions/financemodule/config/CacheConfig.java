@@ -13,3 +13,4 @@ public class CacheConfig {
         return new ConcurrentMapCacheManager("goals");
     }
 }
+

@@ -1,11 +1,9 @@
 package cz.cvut.fel.nss.transactions.financemodule.kafka;
 
 import cz.cvut.fel.nss.transactions.financemodule.kafka.dto.TransactionInfoDto;
-import cz.cvut.fel.nss.transactions.financemodule.service.FinanceService;
 import cz.cvut.fel.nss.transactions.financemodule.service.GoalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 

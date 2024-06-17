@@ -1,25 +1,17 @@
 package cz.cvut.fel.nss.transactions.financemodule.service;
 
 
-import cz.cvut.fel.nss.transactions.financemodule.entity.Debt;
-import cz.cvut.fel.nss.transactions.financemodule.entity.Finance;
 import cz.cvut.fel.nss.transactions.financemodule.entity.Goal;
 import cz.cvut.fel.nss.transactions.financemodule.entity.GoalMementoEntity;
 import cz.cvut.fel.nss.transactions.financemodule.kafka.dto.TransactionInfoDto;
 import cz.cvut.fel.nss.transactions.financemodule.memento.GoalCaretaker;
-
-import cz.cvut.fel.nss.transactions.financemodule.repository.FinanceRepository;
 import cz.cvut.fel.nss.transactions.financemodule.repository.GoalRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -31,34 +23,18 @@ import java.util.Optional;
 public class GoalService {
 
     private final GoalRepository goalRepository;
-
-    private final FinanceRepository financeRepository;
-
     private final GoalCaretaker caretaker;
     //private List<GoalMemento> mementoList = new ArrayList<>();
 
     @Autowired
-    public GoalService(GoalRepository goalRepository, GoalCaretaker caretaker, FinanceRepository financeRepository) {
+    public GoalService(GoalRepository goalRepository, GoalCaretaker caretaker) {
         this.goalRepository = goalRepository;
         this.caretaker = caretaker;
-        this.financeRepository = financeRepository;
     }
 
-
     public Goal getGoalById(int goalId, int userId){
-//        Optional<Finance> optionalIncome = financeRepository.getFinanceById(goalId);
-//        Goal goal = new Goal();
-//        goal.setName(optionalIncome.get().getName());
-//        goal.setAmount(optionalIncome.get().getAmount());
-//        goal.setId(optionalIncome.get().getId());
-//        goal.setUserId(optionalIncome.get().getUserId());
-//
-//        System.out.println("asdasd" + optionalIncome.get().getName());
-////        return optionalIncome.orElseThrow(() -> new RuntimeException("Goal not found with id: " + goalId + " for user: " + userId));
-//        return goal;
         Optional<Goal> optionalIncome = goalRepository.findByIdAndUserId(goalId, userId);
         return optionalIncome.orElseThrow(() -> new RuntimeException("Goal not found with id: " + goalId + " for user: " + userId));
-
     }
 
 
@@ -90,7 +66,6 @@ public class GoalService {
 
 
 
-
     public List<Goal> getAllGoals(int userId) {
         return goalRepository.findAllByUserId(userId);
     }
@@ -116,7 +91,6 @@ public class GoalService {
         }
 
     }
-
 
 
 }

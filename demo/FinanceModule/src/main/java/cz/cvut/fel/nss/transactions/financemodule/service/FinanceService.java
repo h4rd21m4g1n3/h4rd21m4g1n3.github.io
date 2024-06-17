@@ -1,7 +1,6 @@
 package cz.cvut.fel.nss.transactions.financemodule.service;
 
 
-import cz.cvut.fel.nss.transactions.financemodule.entity.Debt;
 import cz.cvut.fel.nss.transactions.financemodule.entity.Finance;
 import cz.cvut.fel.nss.transactions.financemodule.repository.FinanceRepository;
 import org.springframework.stereotype.Service;

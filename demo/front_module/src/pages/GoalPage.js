@@ -396,7 +396,6 @@ function GoalPage() {
                 <ul>
                     {goalHistory.map((history, index) => (
                         <li key={index} className={styles.historyItem}>
-                            <p>Date: {new Date(history.date).toLocaleString()}</p>
                             <p>Name: {history.name}</p>
                             <p>Amount: ${history.amount}</p>
                             {/* Add more fields as necessary */}

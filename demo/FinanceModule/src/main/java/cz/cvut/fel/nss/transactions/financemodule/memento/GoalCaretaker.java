@@ -4,7 +4,6 @@ import cz.cvut.fel.nss.transactions.financemodule.entity.GoalMementoEntity;
 import cz.cvut.fel.nss.transactions.financemodule.repository.GoalMementoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,7 +18,6 @@ public class GoalCaretaker {
         this.goalMementoRepository = goalMementoRepository;
     }
 
-    @Transactional
     public void addMemento(GoalMementoEntity memento) {
         goalMementoRepository.save(memento);
     }

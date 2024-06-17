@@ -3,7 +3,6 @@ package cz.cvut.fel.nss.transactions.financemodule.controller;
 import cz.cvut.fel.nss.transactions.financemodule.dto.DebtDTO;
 import cz.cvut.fel.nss.transactions.financemodule.entity.Debt;
 import cz.cvut.fel.nss.transactions.financemodule.interest_strategy.CompoundInterestCalculationStrategy;
-import cz.cvut.fel.nss.transactions.financemodule.interest_strategy.InterestCalculationStrategy;
 import cz.cvut.fel.nss.transactions.financemodule.interest_strategy.InterestCalculator;
 import cz.cvut.fel.nss.transactions.financemodule.interest_strategy.SimpleInterestCalculationStrategy;
 import cz.cvut.fel.nss.transactions.financemodule.repository.DebtRepository;
@@ -48,6 +47,7 @@ public class DebtController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error occurred");
         }
     }
+
 
     @GetMapping("/all")
     public ResponseEntity<?> getAllDebtById( @RequestParam int userId) {
