@@ -1,0 +1,19 @@
+package cz.cvut.fel.nss.transactions.transaction_module.entity;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+/**
+ * Represents an expense transaction.
+ */
+@Getter
+@Setter
+@Entity
+@Table(name="expense")
+public class Expense extends Transaction {
+
+    @ManyToOne
+    @JoinColumn(name = "expense_category_id", nullable = false)
+    private ExpenseCategory expenseCategory;
+}
