@@ -17,10 +17,10 @@ Link to full documentation: https://docs.google.com/document/d/1ZNRClOIRlwfz3rmw
 
 ## Project Structure
 
-- FinanceMicroservice: `demo/FinanceModule`. Contains all the logic related to goals and debts.
-- TransactionMicroservice: `demo/TransactionModule`. Contains all the logic related to transactions.
-- UserMicroservice: `demo/UserMicroservice`. Contains all the logic related user authorization, authentication.
-- Front end:  `demo/front_module`. Contains all the logic related to front end.
+- FinanceMicroservice: `FinanceModule`. Contains all the logic related to goals and debts.
+- TransactionMicroservice: `TransactionModule`. Contains all the logic related to transactions.
+- UserMicroservice: `UserMicroservice`. Contains all the logic related user authorization, authentication.
+- Front end:  `front_module`. Contains all the logic related to front end.
 - Documentation: `README.md`. This file, containing brief description of the usage and purpose of the Budget Manager.
 
 ## Functionalities
@@ -43,12 +43,12 @@ A quick description of the fulfilled requirements for easier localization.
 
 | Requirement                                                              | Location                                                                       | Status                              |
 |--------------------------------------------------------------------------|--------------------------------------------------------------------------------|-------------------------------------|
-| Use of cache (e.g., Hazelcast)                                           | `demo/FinanceModule` - CacheConfig.java, GoalController.java                   | Fulfilled                           |
-| Use of messaging principles (Kafka or JMS)                               | `demo/FinanceModule/kafka`,<br/> `demo/TransactionModule/kafka`                | Fulfilled                           |
-| Application security using basic authorization or OAuth2                 | `demo/UserMicroservice` - WebSecurityConfig.java                               | Fulfilled                           |
-| Use of Interceptors (at least one class)                                 | `demo/TransactionModule` - ExpenseInterceptor, IncomeInterceptor               | Fulfilled                           |
+| Use of cache (e.g., Hazelcast)                                           | `FinanceModule` - CacheConfig.java, GoalController.java                   | Fulfilled                           |
+| Use of messaging principles (Kafka or JMS)                               | `FinanceModule/kafka`,<br/> `TransactionModule/kafka`                | Fulfilled                           |
+| Application security using basic authorization or OAuth2                 | `UserMicroservice` - WebSecurityConfig.java                               | Fulfilled                           |
+| Use of Interceptors (at least one class)                                 | `TransactionModule` - ExpenseInterceptor, IncomeInterceptor               | Fulfilled                           |
 | Use of one of the following technologies: SOAP, REST, GraphQL, Java RMI  | REST                                                                           | Fulfilled                           |
-| Use of Elasticsearch                                                     | `demo/TransactionModule` - TransactionController.java, TransactionService.java | Not working, <br/>but we came close |
+| Use of Elasticsearch                                                     | `TransactionModule` - TransactionController.java, TransactionService.java | Not working, <br/>but we came close |
 
 ### Mandatory Requirements
 
@@ -60,7 +60,7 @@ A quick description of the fulfilled requirements for easier localization.
 | Deployment to production server                                              | [Deployment instructions](#deployment)                                                                                                                                                                                                                                                                                                                                                        | Fulfilled |
 | SW architecture design selection                                             | Client-Dispatcher-Server (more in full document)                                                                                                                                                                                                                                                                                                                                              | Fulfilled |
 | Initialization procedure                                                     | [Initialization Procedure](#initialization-procedure)                                                                                                                                                                                                                                                                                                                                         | Fulfilled |
-| Use of 5 design patterns                                                     | **Memento** - GoalMemento, `demo/FinanceModule` <br/>**Strategy** - InterestCalculationStrategy  `demo/FinanceModule`(SimpleInterestCalculationStrategy,  CompoundInterestCalculationStrategy)<br/>**Interceptor** - ExpenseInterceptor, IncomeInterceptor `demo/TransactionModule`<br/>**DTO** - dto folder in UserMicroservice, TransactionModule, FinanceModule <br/>**Promise** - frontend | Fulfilled |
+| Use of 5 design patterns                                                     | **Memento** - GoalMemento, `FinanceModule` <br/>**Strategy** - InterestCalculationStrategy  `FinanceModule`(SimpleInterestCalculationStrategy,  CompoundInterestCalculationStrategy)<br/>**Interceptor** - ExpenseInterceptor, IncomeInterceptor `TransactionModule`<br/>**DTO** - dto folder in UserMicroservice, TransactionModule, FinanceModule <br/>**Promise** - frontend | Fulfilled |
 | Each team member contributes 2 use cases (to ensure software is not trivial) | 3 members => 6 UC                                                                                                                                                                                                                                                                                                                                                                             | Fulfilled |
 | Javadoc                                                                      | Present in all service layers <br/> and for additional functionalities                                                                                                                                                                                                                                                                                                                        | Fulfilled |
  
